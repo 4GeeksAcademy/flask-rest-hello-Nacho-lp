@@ -35,6 +35,8 @@ class Post(db.Model):
     id: Mapped[int]= mapped_column(primary_key=True)
     user_id: Mapped[int]= mapped_column(ForeignKey("user.id"))
     image: Mapped[bytes]= mapped_column(nullable=False)
+    like_id: Mapped[int] = mapped_column(ForeignKey("likes.id"))
+
     def serialize(self) -> dict:
         image_b64 = base64.b64encode(self.image).decode("utf-8")
         return {
@@ -45,7 +47,8 @@ class Comment(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     post_id: Mapped[int] = mapped_column(ForeignKey("post.id"))
-    
+    like_id: Mapped[int] = mapped_column(ForeignKey("likes.id"))
+
     def serialize(self):
         return{
             "author": self.author_id,
@@ -54,7 +57,6 @@ class Comment(db.Model):
 class Likes(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     like: Mapped[bool] = mapped_column(Boolean(), nullable=False)
-    post_id: Mapped[int] = mapped_column(ForeignKey("post.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
 
     def serialize(self):
