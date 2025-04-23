@@ -21,9 +21,8 @@ class User(db.Model):
 
         
 class Follower(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    user_from_id: Mapped[int]= mapped_column(ForeignKey("user.id"))
-    user_to_id: Mapped[int]= mapped_column(ForeignKey("user.id"))
+    user_from_id: Mapped[int]= mapped_column(ForeignKey("user.id"), primary_key=True)
+    user_to_id: Mapped[int]= mapped_column(ForeignKey("user.id"), primary_key=True)
     
     def serialize(self) -> dict:
         return {
@@ -35,7 +34,6 @@ class Post(db.Model):
     id: Mapped[int]= mapped_column(primary_key=True)
     user_id: Mapped[int]= mapped_column(ForeignKey("user.id"))
     image: Mapped[bytes]= mapped_column(nullable=False)
-    like_id: Mapped[int] = mapped_column(ForeignKey("likes.id"))
 
     def serialize(self) -> dict:
         image_b64 = base64.b64encode(self.image).decode("utf-8")
@@ -47,7 +45,6 @@ class Comment(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     author_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     post_id: Mapped[int] = mapped_column(ForeignKey("post.id"))
-    like_id: Mapped[int] = mapped_column(ForeignKey("likes.id"))
 
     def serialize(self):
         return{
@@ -58,7 +55,9 @@ class Likes(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     like: Mapped[bool] = mapped_column(Boolean(), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-
+    post_id: Mapped[int] =mapped_column(ForeignKey("post.id"),  nullable=True)
+    comment_id: Mapped[int] = mapped_column(ForeignKey("comment.id"), nullable=True)
+    # falta relacionar post y comment nullable=True
     def serialize(self):
         return{
             "like": self.like,
